@@ -15,5 +15,12 @@ module.exports = {
       })
       return res.json({ success: true, data: { totalAmount, shopcars } })
     })
+  },
+  // 商品加入購物車
+  postShopcars: (req, res, next) => {
+    shopcarService.postShopcars(req, err => {
+      if (err) return next(err)
+      return res.json({ success: true, message: '成功加入購物車!' })
+    })
   }
 }
