@@ -9,7 +9,7 @@ const { authenticated } = require('../../middleware/auth')
 // 登入
 router.post('/users/signin', passport.authenticate('local', { session: false }), userController.signIn)
 
-router.use('/products', authenticated, products)
+router.use('/products', products)
 router.use('/', apiErrorHandler)
 
 module.exports = router

@@ -1,7 +1,6 @@
 const { Product } = require('../models')
 const { filterSet } = require('../helpers/filter-helpers')
 
-const PRODUCT_DESCRIPTION_LIMIT = 20 // 商品描述字數限制
 const MAX_DEFAULT = Number.MAX_VALUE // 最大值預設
 const MIN_DEFAULT = 0 // 最小值預設
 
@@ -19,12 +18,8 @@ module.exports = {
         raw: true,
         where: filterSet(min, max, keyword, minQuantity, maxQuantity) // 將篩選條件丟給filterSet處理
       })
-      const productsData = products.map(product => ({
-        ...product,
-        description: product.description.substring(0, PRODUCT_DESCRIPTION_LIMIT)
-      }))
 
-      return cb(null, { products: productsData })
+      return cb(null, { products })
     } catch (err) {
       return cb(err)
     }
