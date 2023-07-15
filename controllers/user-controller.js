@@ -16,7 +16,7 @@ module.exports = {
         }
       })
     } catch (err) {
-      next(err)
+      return next(err)
     }
   }
 }

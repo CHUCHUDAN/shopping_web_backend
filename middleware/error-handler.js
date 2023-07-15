@@ -9,7 +9,7 @@ module.exports = {
     } else {
       res.status(500).json({
         success: false,
-        message: `${err.message}`
+        message: `${err}`
       })
     }
     next(err)
