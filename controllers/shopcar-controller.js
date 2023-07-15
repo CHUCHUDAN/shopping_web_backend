@@ -29,5 +29,12 @@ module.exports = {
       if (err) return next(err)
       return res.json({ success: true, message: '成功移除商品!' })
     })
+  },
+  // 購物車商品數量增減
+  patchShopcars: (req, res, next) => {
+    shopcarService.patchShopcars(req, err => {
+      if (err) return next(err)
+      return res.json({ success: true, message: '成功修改商品數量!' })
+    })
   }
 }

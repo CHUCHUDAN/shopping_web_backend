@@ -11,4 +11,7 @@ router.post('/:product_id', shopcarController.postShopcars)
 // 購物車移除商品
 router.delete('/:product_id', shopcarController.deleteShopcars)
 
+// 購物車商品數量增減
+router.patch('/', shopcarController.patchShopcars)
+
 module.exports = router
