@@ -36,5 +36,12 @@ module.exports = {
       if (err) return next(err)
       return res.json({ success: true, message: '成功修改商品數量!' })
     })
+  },
+  // 購物車結帳
+  checkoutShopcars: (req, res, next) => {
+    shopcarService.checkoutShopcars(req, err => {
+      if (err) return next(err)
+      return res.json({ success: true, message: '結帳成功!' })
+    })
   }
 }

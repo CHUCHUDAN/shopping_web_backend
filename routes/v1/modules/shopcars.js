@@ -5,6 +5,9 @@ const shopcarController = require('../../../controllers/shopcar-controller')
 // 取得購物車所有商品
 router.get('/', shopcarController.getShopcars)
 
+// 購物車結帳
+router.post('/checkout', shopcarController.checkoutShopcars)
+
 // 商品加入購物車
 router.post('/:product_id', shopcarController.postShopcars)
 

@@ -102,5 +102,45 @@ module.exports = {
     } catch (err) {
       return cb(err)
     }
+  },
+  // 購物車結帳
+  checkoutShopcars: async (req, cb) => {
+    try {
+      const userId = getUser(req).id
+      const body = req.body
+      for (const key in body) {
+        // 檢查商品是否存在
+        const product = await Product.findByPk(key, {
+          attributes: ['id', 'inventory_quantity']
+        })
+        if (!product) throw new CustomError('商品不存在！', 404)
+
+        // 檢查是否在購物車內
+        const shopcar = await Shopcar.findOne({
+          where: { user_id: userId, product_id: key },
+          attributes: ['id', 'quantity']
+        })
+        if (!shopcar) throw new CustomError('商品還未加入購物車！', 400)
+
+        // 檢查商品數量是否正確
+        if (shopcar.quantity !== body[key]) throw new CustomError('請先更新購物車再進行結帳！', 400)
+
+        // 檢查存貨是否足夠
+        if (product.inventory_quantity < body[key]) throw new CustomError('商品存貨不足！', 400)
+
+        const inventoryQuantity = product.inventory_quantity - body[key]
+
+        // 減少商品存貨數量
+        await product.update({
+          inventory_quantity: inventoryQuantity
+        })
+
+        // 清空購物車
+        await shopcar.destroy()
+      }
+      return cb(null)
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
