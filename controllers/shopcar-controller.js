@@ -22,5 +22,12 @@ module.exports = {
       if (err) return next(err)
       return res.json({ success: true, message: '成功加入購物車!' })
     })
+  },
+  // 購物車移除商品
+  deleteShopcars: (req, res, next) => {
+    shopcarService.deleteShopcars(req, err => {
+      if (err) return next(err)
+      return res.json({ success: true, message: '成功移除商品!' })
+    })
   }
 }

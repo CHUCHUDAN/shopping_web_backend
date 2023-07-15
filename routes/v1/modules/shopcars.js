@@ -8,4 +8,7 @@ router.get('/', shopcarController.getShopcars)
 // 商品加入購物車
 router.post('/:product_id', shopcarController.postShopcars)
 
+// 購物車移除商品
+router.delete('/:product_id', shopcarController.deleteShopcars)
+
 module.exports = router
