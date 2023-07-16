@@ -12,5 +12,9 @@ module.exports = {
       }))
       return res.json({ success: true, data: { products } })
     })
+  },
+  // 商家上架商品
+  postStores: (req, res, next) => {
+    storeService.postStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品上架成功' }))
   }
 }
