@@ -10,4 +10,7 @@ router.get('/', storeController.getStores)
 // 商家上架商品
 router.post('/', upload.single('avatar'), validation, storeController.postStores)
 
+// 商家下架商品
+router.delete('/:product_id', storeController.deleteStores)
+
 module.exports = router

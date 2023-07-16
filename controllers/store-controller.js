@@ -16,5 +16,9 @@ module.exports = {
   // 商家上架商品
   postStores: (req, res, next) => {
     storeService.postStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品上架成功' }))
+  },
+  // 商家下架商品
+  deleteStores: (req, res, next) => {
+    storeService.deleteStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品已下架' }))
   }
 }
