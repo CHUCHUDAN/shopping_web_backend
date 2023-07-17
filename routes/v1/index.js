@@ -7,9 +7,10 @@ const products = require('./modules/products')
 const shopcars = require('./modules/shopcars')
 const stores = require('./modules/stores')
 const { authenticated, isBuyer, isSeller } = require('../../middleware/auth')
+const { validation } = require('../../middleware/validation')
 
 // 登入
-router.post('/users/signin', passport.authenticate('local', { session: false }), userController.signIn)
+router.post('/users/signin', validation, passport.authenticate('local', { session: false }), userController.signIn)
 
 router.use('/stores', authenticated, isSeller, stores)
 router.use('/shopcars', authenticated, isBuyer, shopcars)

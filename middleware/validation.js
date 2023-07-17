@@ -1,6 +1,13 @@
 const { CustomError } = require('../helpers/error-builder')
 const { isNumeric, isLength } = require('validator')
 
+// 使用者登入(字數)
+const ACCOUNT_SIGNIN_MIN_COUNT = 3
+const ACCOUNT_SIGNIN_MAX_COUNT = 50
+
+const PASSWORD_SIGNIN_MIN_COUNT = 4
+const PASSWORD_SIGNIN_MAX_COUNT = 50
+
 // 商品上架資料(字數)
 const NAME_STORE_MIN_COUNT = 1
 const NAME_STORE_MAX_COUNT = 100
@@ -23,6 +30,9 @@ function ObjDataGenerate (formName, type, typeParameter = {}, minCount, maxCount
 }
 
 const validationData = {
+  // 使用者登入資料
+  accountOfSigninValid: new ObjDataGenerate('帳號', undefined, undefined, ACCOUNT_SIGNIN_MIN_COUNT, ACCOUNT_SIGNIN_MAX_COUNT),
+  passwordOfSigninValid: new ObjDataGenerate('密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
 
   // 商品上架資料
   nameOfStoreValid: new ObjDataGenerate('商品名稱', undefined, undefined, NAME_STORE_MIN_COUNT, NAME_STORE_MAX_COUNT),
@@ -39,11 +49,13 @@ module.exports = {
       const fullUrl = req.method + req.originalUrl
       const body = req.body
       let afterText = ''
-      const { name, price, inventory, description } = body
+      const { name, account, password, price, inventory, description } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
       if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description)) {
         afterText = 'OfStoreValid'
+      } else if (fullUrl === 'POST/api/v1/users/signin' && (account && password)) {
+        afterText = 'OfSigninValid'
       } else {
         throw new CustomError('所有值為必填', 400)
       }
