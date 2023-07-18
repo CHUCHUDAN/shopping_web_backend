@@ -32,6 +32,14 @@ const jwtOptions = {
 // 每次req都驗證token
 passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
   try {
+    // 檢查 JWT 的到期日
+    const expirationDate = new Date(jwtPayload.exp * 1000)
+    const currentDate = new Date()
+
+    if (expirationDate < currentDate) {
+      // JWT 已過期，拒絕驗證
+      return cb(null, false)
+    }
     const user = await User.findByPk(jwtPayload.id)
     return cb(null, user)
   } catch (err) {
