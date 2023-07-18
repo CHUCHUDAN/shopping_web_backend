@@ -22,5 +22,16 @@ module.exports = {
     } catch (err) {
       return next(err)
     }
+  },
+  // token 檢查使用者權限
+  tokenCheck: (req, res, next) => {
+    try {
+      return res.json({
+        success: true,
+        message: '權限正常'
+      })
+    } catch (err) {
+      return next(err)
+    }
   }
 }
