@@ -33,5 +33,18 @@ module.exports = {
     } catch (err) {
       return next(err)
     }
+  },
+  // 取得使用者資料
+  getUser: (req, res, next) => {
+    try {
+      const user = getUser(req).toJSON()
+      delete user.password
+      return res.json({
+        success: true,
+        user
+      })
+    } catch (err) {
+      return next(err)
+    }
   }
 }

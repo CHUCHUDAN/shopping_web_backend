@@ -6,6 +6,7 @@ const passport = require('../../config/passport')
 const products = require('./modules/products')
 const shopcars = require('./modules/shopcars')
 const stores = require('./modules/stores')
+const users = require('./modules/users')
 const upload = require('../../middleware/multer')
 const { authenticated, isBuyer, isSeller } = require('../../middleware/auth')
 const { validation } = require('../../middleware/validation')
@@ -13,9 +14,7 @@ const { validation } = require('../../middleware/validation')
 // 登入
 router.post('/users/signin', upload.single('avatar'), validation, passport.authenticate('local', { session: false }), userController.signIn)
 
-// token 檢查使用者權限
-router.post('/users/tokenCheck', authenticated, userController.tokenCheck)
-
+router.use('/users', authenticated, users)
 router.use('/stores', authenticated, isSeller, stores)
 router.use('/shopcars', authenticated, isBuyer, shopcars)
 router.use('/products', products)
