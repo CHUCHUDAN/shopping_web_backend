@@ -26,9 +26,12 @@ module.exports = {
 
       // 檢查商品是否存在
       const product = await Product.findByPk(productId, {
-        attributes: ['id']
+        attributes: ['id', 'inventory_quantity']
       })
       if (!product) throw new CustomError('商品不存在！', 404)
+
+      // 檢查商品存貨是否不足
+      if (product.inventory_quantity < 1) throw new CustomError('商品存貨不足！', 404)
 
       // 檢查是否在購物車內
       const shopcar = await Shopcar.findOne({
