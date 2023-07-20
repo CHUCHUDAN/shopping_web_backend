@@ -1,4 +1,5 @@
 const shopcarService = require('../service/shopcar-service')
+const { CustomError } = require('../helpers/error-builder')
 
 module.exports = {
   // 取得購物車所有商品及總金額
@@ -32,6 +33,10 @@ module.exports = {
   },
   // 購物車商品數量增減
   patchShopcars: (req, res, next) => {
+  // 檢查購物車內是否有商品
+
+    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 400)
+
     shopcarService.patchShopcars(req, err => {
       if (err) return next(err)
       return res.json({ success: true, message: '成功修改商品數量!' })
@@ -39,6 +44,10 @@ module.exports = {
   },
   // 購物車結帳
   checkoutShopcars: (req, res, next) => {
+    // 檢查購物車內是否有商品
+
+    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 400)
+
     shopcarService.checkoutShopcars(req, err => {
       if (err) return next(err)
       return res.json({ success: true, message: '結帳成功!' })
