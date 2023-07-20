@@ -89,6 +89,13 @@ module.exports = {
         })
         if (!product) throw new CustomError('商品不存在！', 404)
 
+        // 檢查購物車內是否有商品
+        const shopcars = await Shopcar.findOne({
+          where: { user_id: userId },
+          attributes: ['id']
+        })
+        if (!shopcars) throw new CustomError('購物車內沒有商品！', 400)
+
         // 檢查是否在購物車內
         const shopcar = await Shopcar.findOne({
           where: { user_id: userId, product_id: key },
@@ -117,6 +124,13 @@ module.exports = {
           attributes: ['id', 'inventory_quantity']
         })
         if (!product) throw new CustomError('商品不存在！', 404)
+
+        // 檢查購物車內是否有商品
+        const shopcars = await Shopcar.findOne({
+          where: { user_id: userId },
+          attributes: ['id']
+        })
+        if (!shopcars) throw new CustomError('購物車內沒有商品！', 400)
 
         // 檢查是否在購物車內
         const shopcar = await Shopcar.findOne({
