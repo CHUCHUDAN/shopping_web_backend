@@ -9,7 +9,8 @@ module.exports = {
       const userId = getUser(req).id
       const products = await Product.findAll({
         raw: true,
-        where: { user_id: userId }
+        where: { user_id: userId },
+        order: [['created_at', 'DESC']]
       })
 
       return cb(null, products)
