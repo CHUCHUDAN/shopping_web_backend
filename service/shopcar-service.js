@@ -11,6 +11,7 @@ module.exports = {
         raw: true,
         nest: true,
         where: { user_id: userId },
+        order: [['created_at', 'DESC']],
         include: { model: Product }
       })
       return cb(null, { shopcars })
