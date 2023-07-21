@@ -65,11 +65,11 @@ module.exports = {
         const data = validationData[`${key}${afterText}`] // 資料物件
 
         // 檢查資料格式
-        if (data.type && !data.type(value, data.typeParameter)) throw new CustomError(`${data.formName}格式錯誤`, 400)
+        if (data?.type && !data.type(value, data.typeParameter)) throw new CustomError(`${data.formName}格式錯誤`, 400)
 
         // 檢查字數
-        if (!isLength(value, { min: data.minCount })) throw new CustomError(`${data.formName}不符合最小字數`, 400)
-        if (!isLength(value, { max: data.maxCount })) throw new CustomError(`${data.formName}不符合最大字數`, 400)
+        if (!isLength(value, { min: data?.minCount })) throw new CustomError(`${data.formName}不符合最小字數`, 400)
+        if (!isLength(value, { max: data?.maxCount })) throw new CustomError(`${data.formName}不符合最大字數`, 400)
       }
 
       return next()
