@@ -16,7 +16,8 @@ module.exports = {
 
       const products = await Product.findAll({
         raw: true,
-        where: filterSet(min, max, keyword, minQuantity, maxQuantity) // 將篩選條件丟給filterSet處理
+        where: filterSet(min, max, keyword, minQuantity, maxQuantity), // 將篩選條件丟給filterSet處理
+        order: [['created_at', 'DESC']]
       })
 
       return cb(null, { products })
