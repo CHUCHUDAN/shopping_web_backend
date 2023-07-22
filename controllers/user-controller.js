@@ -1,4 +1,5 @@
 const { getUser } = require('../helpers/auth-helpers')
+const userService = require('../service/user-service')
 const jwt = require('jsonwebtoken')
 
 module.exports = {
@@ -22,6 +23,10 @@ module.exports = {
     } catch (err) {
       return next(err)
     }
+  },
+  // 註冊
+  signUp: (req, res, next) => {
+    userService.signUp(req, (err, data) => err ? next(err) : res.json({ success: true, message: '註冊成功' }))
   },
   // token 檢查使用者權限
   tokenCheck: (req, res, next) => {

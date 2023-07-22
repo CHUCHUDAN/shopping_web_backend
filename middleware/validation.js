@@ -20,6 +20,13 @@ const INVENTORY_STORE_MAX_COUNT = 10
 
 const DESCRIPTION_STORE_MIN_COUNT = 1
 
+// 使用者註冊資料
+const NAME_REGISTER_MAX_COUNT = 20
+
+const ACCOUNT_REGISTER_MAX_COUNT = 50
+
+const ROLE_REGISTER_MAX_COUNT = 10
+
 // 資料建構
 function ObjDataGenerate (formName, type, typeParameter = {}, minCount, maxCount) {
   this.formName = formName
@@ -33,6 +40,12 @@ const validationData = {
   // 使用者登入資料
   accountOfSigninValid: new ObjDataGenerate('帳號', undefined, undefined, ACCOUNT_SIGNIN_MIN_COUNT, ACCOUNT_SIGNIN_MAX_COUNT),
   passwordOfSigninValid: new ObjDataGenerate('密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
+
+  // 使用者註冊資料
+  nameOfRegisterValid: new ObjDataGenerate('使用者名稱', undefined, undefined, undefined, NAME_REGISTER_MAX_COUNT),
+  accountOfRegisterValid: new ObjDataGenerate('帳號', undefined, undefined, undefined, ACCOUNT_REGISTER_MAX_COUNT),
+  roleOfRegisterValid: new ObjDataGenerate('帳號類型', undefined, undefined, undefined, ROLE_REGISTER_MAX_COUNT),
+  passwordOfRegisterValid: new ObjDataGenerate('密碼', undefined, undefined, undefined, undefined),
 
   // 商品上架資料
   nameOfStoreValid: new ObjDataGenerate('商品名稱', undefined, undefined, NAME_STORE_MIN_COUNT, NAME_STORE_MAX_COUNT),
@@ -49,13 +62,17 @@ module.exports = {
       const fullUrl = req.method + req.originalUrl
       const body = req.body
       let afterText = ''
-      const { name, account, password, price, inventory, description } = body
+      const { name, account, password, passwordCheck, role, price, inventory, description } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
       if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description)) {
         afterText = 'OfStoreValid'
       } else if (fullUrl === 'POST/api/v1/users/signin' && (account && password)) {
         afterText = 'OfSigninValid'
+      } else if (fullUrl === 'POST/api/v1/user' && (name && account && password && passwordCheck && role)) {
+        if (role !== 'buyer' && role !== 'seller') throw new CustomError('帳號類型只能是buyer或seller', 400)
+        if (password !== passwordCheck) throw new CustomError('密碼與確認密碼不相符', 400)
+        afterText = 'OfRegisterValid'
       } else {
         throw new CustomError('所有值為必填', 400)
       }
