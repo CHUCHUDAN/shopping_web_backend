@@ -60,12 +60,14 @@ module.exports = {
   validation: (req, res, next) => {
     try {
       const fullUrl = req.method + req.originalUrl
+      const { file } = req
       const body = req.body
       let afterText = ''
       const { name, account, password, passwordCheck, role, price, inventory, description } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
       if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description)) {
+        if (file === undefined) throw new CustomError('所有值為必填', 400)
         afterText = 'OfStoreValid'
       } else if (fullUrl === 'POST/api/v1/users/signin' && (account && password)) {
         afterText = 'OfSigninValid'
@@ -73,6 +75,9 @@ module.exports = {
         if (role !== 'buyer' && role !== 'seller') throw new CustomError('帳號類型只能是buyer或seller', 400)
         if (password !== passwordCheck) throw new CustomError('密碼與確認密碼不相符', 400)
         afterText = 'OfRegisterValid'
+      } else if (fullUrl.startsWith('PUT/api/v1/stores/') && (name && price && inventory && description)) {
+        if (file === undefined) throw new CustomError('所有值為必填', 400)
+        afterText = 'OfStoreValid'
       } else {
         throw new CustomError('所有值為必填', 400)
       }

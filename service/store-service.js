@@ -57,7 +57,7 @@ module.exports = {
       if (!product) throw new CustomError('商品不存在！', 404)
 
       // 檢查商品是否為本帳號使用者的商品
-      if (product.user_id !== userId) throw new CustomError('非本帳號商品無法下架！', 404)
+      if (product.user_id !== userId) throw new CustomError('非本帳號商品無法下架！', 400)
 
       // 刪除商品跟購物車內之該商品
 
@@ -73,6 +73,38 @@ module.exports = {
     } catch (err) {
       await transaction.rollback()
 
+      return cb(err)
+    }
+  },
+  // 商家編輯商品
+  putStores: async (req, cb) => {
+    try {
+      const { name, price, inventory, description } = req.body
+      const productId = req.params.product_id
+      const userId = getUser(req).id
+      const { file } = req
+
+      // 檢查商品是否存在
+      const product = await Product.findByPk(productId, {
+        attributes: ['id', 'user_id', 'avatar']
+      })
+      if (!product) throw new CustomError('商品不存在！', 404)
+
+      // 檢查商品是否為本帳號使用者的商品
+      if (product.user_id !== userId) throw new CustomError('非本帳號商品無法編輯！', 400)
+
+      const avatar = await imgurFileHandler(file)
+
+      await product.update({
+        user_id: userId,
+        name,
+        price,
+        inventory_quantity: inventory,
+        avatar,
+        description
+      })
+      return cb(null)
+    } catch (err) {
       return cb(err)
     }
   }

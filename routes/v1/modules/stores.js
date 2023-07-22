@@ -13,4 +13,7 @@ router.post('/', upload.single('avatar'), validation, storeController.postStores
 // 商家下架商品
 router.delete('/:product_id', storeController.deleteStores)
 
+// 商家編輯商品
+router.put('/:product_id', upload.single('avatar'), validation, storeController.putStores)
+
 module.exports = router
