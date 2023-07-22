@@ -1,5 +1,6 @@
-const { Product } = require('../models')
+const { Product, User } = require('../models')
 const { filterSet } = require('../helpers/filter-helpers')
+const { CustomError } = require('../helpers/error-builder')
 
 const MAX_DEFAULT = Number.MAX_VALUE // 最大值預設
 const MIN_DEFAULT = 0 // 最小值預設
@@ -21,6 +22,29 @@ module.exports = {
       })
 
       return cb(null, { products })
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  // 取得單一商品
+  getProduct: async (req, cb) => {
+    try {
+      const productId = req.params.product_id
+      const product = await Product.findByPk(productId, {
+        raw: true,
+        nest: true,
+        include: { model: User, attributes: ['id', 'name'] }
+      })
+
+      // 檢查商品是否存在
+      if (!product) throw new CustomError('商品不存在！', 404)
+
+      const userId = product.User.id
+
+      // 檢查該商品商家否存在
+      if (!userId) throw new CustomError('商家不存在！', 404)
+
+      return cb(null, { product })
     } catch (err) {
       return cb(err)
     }

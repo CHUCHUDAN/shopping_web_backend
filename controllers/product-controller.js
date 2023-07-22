@@ -1,4 +1,5 @@
 const productService = require('../service/product-service')
+const { switchTime } = require('../helpers/dayFix-helper')
 const PRODUCT_DESCRIPTION_LIMIT = 20 // 商品描述字數限制
 
 module.exports = {
@@ -11,6 +12,16 @@ module.exports = {
         description: product.description.substring(0, PRODUCT_DESCRIPTION_LIMIT)
       }))
       return res.json({ success: true, data: { products } })
+    })
+  },
+  // 取得單一商品
+  getProduct: (req, res, next) => {
+    productService.getProduct(req, (err, data) => {
+      if (err) return next(err)
+      const product = data.product
+
+      product.addShopTime = switchTime(product.createdAt)
+      return res.json({ success: true, data: { product } })
     })
   }
 }

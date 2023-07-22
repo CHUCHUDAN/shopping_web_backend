@@ -35,7 +35,7 @@ module.exports = {
   patchShopcars: (req, res, next) => {
   // 檢查購物車內是否有商品
 
-    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 400)
+    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 404)
 
     shopcarService.patchShopcars(req, err => {
       if (err) return next(err)
@@ -46,7 +46,7 @@ module.exports = {
   checkoutShopcars: (req, res, next) => {
     // 檢查購物車內是否有商品
 
-    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 400)
+    if (Object.keys(req.body).length === 0) throw new CustomError('購物車內沒有商品！', 404)
 
     shopcarService.checkoutShopcars(req, err => {
       if (err) return next(err)
