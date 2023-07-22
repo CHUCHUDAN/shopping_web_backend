@@ -22,5 +22,9 @@ module.exports = {
   // 商家下架商品
   deleteStores: (req, res, next) => {
     storeService.deleteStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品已下架' }))
+  },
+  // 商家編輯商品
+  putStores: (req, res, next) => {
+    storeService.putStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品編輯成功' }))
   }
 }
