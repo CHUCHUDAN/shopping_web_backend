@@ -17,6 +17,18 @@ module.exports = {
         type: Sequelize.STRING(50),
         unique: true
       },
+      avatar: {
+        type: Sequelize.STRING,
+        defaultValue: 'https://i.imgur.com/BMxWxE8.jpeg'
+      },
+      email: {
+        type: Sequelize.STRING(50),
+        unique: true
+      },
+      phone: {
+        type: Sequelize.STRING(11),
+        unique: true
+      },
       password: {
         allowNull: false,
         type: Sequelize.STRING
