@@ -3,6 +3,7 @@ const LocalStrategy = require('passport-local')
 const bcrypt = require('bcryptjs')
 const { User } = require('../models')
 const { CustomError } = require('../helpers/error-builder')
+const { Sequelize } = require('sequelize')
 const passportJWT = require('passport-jwt')
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
@@ -49,6 +50,7 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
         'email',
         'phone',
         'role',
+        [Sequelize.literal('(SELECT COUNT(*) FROM `products` WHERE `products`.`user_id` = `user`.`id`)'), 'productsCount'],
         'createdAt',
         'updatedAt'
       ]
