@@ -10,5 +10,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 module.exports = {
+  relativeTimeFromNow: dateTime => dayjs(dateTime).tz('Asia/Taipei').fromNow(),
   switchTime: dateTime => dayjs(dateTime).tz('Asia/Taipei').format('A hh:mm ． YYYY年MM月DD日')
 }

@@ -1,5 +1,6 @@
 const { getUser } = require('../helpers/auth-helpers')
 const userService = require('../service/user-service')
+const { relativeTimeFromNow } = require('../helpers/dayFix-helper')
 const jwt = require('jsonwebtoken')
 
 module.exports = {
@@ -44,12 +45,18 @@ module.exports = {
     try {
       const user = getUser(req).toJSON()
       delete user.password
-      return res.json({
-        success: true,
-        user
-      })
+      user.createdTimeFromNow = relativeTimeFromNow(user.createdAt)
+      return res.json({ success: true, data: { user } })
     } catch (err) {
       return next(err)
     }
+  },
+  // 取得商家資料
+  getSeller: (req, res, next) => {
+    userService.getSeller(req, (err, data) => {
+      if (err) return next(err)
+      data.createdTimeFromNow = relativeTimeFromNow(data.created_at)
+      return res.json({ success: true, data: { seller: data } })
+    })
   }
 }
