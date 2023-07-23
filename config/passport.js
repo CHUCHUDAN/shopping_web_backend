@@ -40,7 +40,19 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
       // JWT 已過期，拒絕驗證
       return cb(null, false)
     }
-    const user = await User.findByPk(jwtPayload.id)
+    const user = await User.findByPk(jwtPayload.id, {
+      attributes: [
+        'id',
+        'name',
+        'account',
+        'avatar',
+        'email',
+        'phone',
+        'role',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
     return cb(null, user)
   } catch (err) {
     return cb(err)

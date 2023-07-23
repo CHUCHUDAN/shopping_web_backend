@@ -44,7 +44,6 @@ module.exports = {
   getUser: (req, res, next) => {
     try {
       const user = getUser(req).toJSON()
-      delete user.password
       user.createdTimeFromNow = relativeTimeFromNow(user.createdAt)
       return res.json({ success: true, data: { user } })
     } catch (err) {

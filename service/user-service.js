@@ -38,6 +38,9 @@ module.exports = {
           'name',
           'account',
           'role',
+          'avatar',
+          'email',
+          'phone',
           [Sequelize.literal('(SELECT COUNT(*) FROM `products` WHERE `products`.`user_id` = `user`.`id`)'), 'productsCount'],
           'created_at',
           'updated_at'
