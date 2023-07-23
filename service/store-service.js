@@ -8,7 +8,7 @@ module.exports = {
   // 取得商家商品清單
   getStores: async (req, cb) => {
     try {
-      const userId = getUser(req).id
+      const userId = req.params.seller_id
       const products = await Product.findAll({
         raw: true,
         where: { user_id: userId },
