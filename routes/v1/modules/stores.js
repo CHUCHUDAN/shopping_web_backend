@@ -13,4 +13,7 @@ router.delete('/:product_id', storeController.deleteStores)
 // 商家編輯商品
 router.put('/:product_id', upload.single('avatar'), validation, storeController.putStores)
 
+// 取得商家本帳號商品清單
+router.get('/', storeController.getSelfStores)
+
 module.exports = router
