@@ -50,6 +50,10 @@ module.exports = {
       // 如果使用者不存在
       if (!seller) throw new CustomError('使用者不存在!', 404)
 
+      // 如果使用者不是商家
+
+      if (seller.role !== 'seller') throw new CustomError('使用者不存在!', 400)
+
       return cb(null, seller)
     } catch (err) {
       return cb(err)
