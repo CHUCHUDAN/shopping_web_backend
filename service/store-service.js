@@ -20,6 +20,21 @@ module.exports = {
       return cb(err)
     }
   },
+  // 取得商家本帳號商品清單
+  getSelfStores: async (req, cb) => {
+    try {
+      const userId = getUser(req).id
+      const products = await Product.findAll({
+        raw: true,
+        where: { user_id: userId },
+        order: [['created_at', 'DESC']]
+      })
+
+      return cb(null, products)
+    } catch (err) {
+      return cb(err)
+    }
+  },
   // 商家上架商品
   postStores: async (req, cb) => {
     try {

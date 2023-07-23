@@ -15,6 +15,18 @@ module.exports = {
       return res.json({ success: true, data: { products } })
     })
   },
+  // 取得商家本帳號商品清單
+  getSelfStores: (req, res, next) => {
+    storeService.getSelfStores(req, (err, data) => {
+      if (err) return next(err)
+      const products = data.map(product => ({
+        ...product,
+        description: product.description.substring(0, PRODUCT_DESCRIPTION_LIMIT),
+        addShopTime: switchTime(product.createdAt)
+      }))
+      return res.json({ success: true, data: { products } })
+    })
+  },
   // 商家上架商品
   postStores: (req, res, next) => {
     storeService.postStores(req, (err, data) => err ? next(err) : res.json({ success: true, message: '商品上架成功' }))
