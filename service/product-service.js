@@ -1,9 +1,12 @@
 const { Product, User } = require('../models')
 const { filterSet } = require('../helpers/filter-helpers')
 const { CustomError } = require('../helpers/error-builder')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const MAX_DEFAULT = Number.MAX_VALUE // 最大值預設
 const MIN_DEFAULT = 0 // 最小值預設
+const DEFAULT_LIMIT = 10 // 預設每頁10筆資料
+const DEFAULT_PAGE = 1 // 預設當前頁數
 
 module.exports = {
   // 取得所有商品
@@ -14,14 +17,19 @@ module.exports = {
       const keyword = req.query.keyword ? req.query.keyword : null
       const minQuantity = req.query.minQuantity ? req.query.minQuantity : MIN_DEFAULT
       const maxQuantity = req.query.maxQuantity ? req.query.maxQuantity : MAX_DEFAULT
+      const page = Number(req.query.page) || DEFAULT_PAGE
+      const limit = Number(req.query.limit) || DEFAULT_LIMIT
+      const offset = getOffset(limit, page)
 
-      const products = await Product.findAll({
+      const products = await Product.findAndCountAll({
         raw: true,
         where: filterSet(min, max, keyword, minQuantity, maxQuantity), // 將篩選條件丟給filterSet處理
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        limit,
+        offset
       })
 
-      return cb(null, { products })
+      return cb(null, { products, pagination: getPagination(limit, page, products.count) })
     } catch (err) {
       return cb(err)
     }
