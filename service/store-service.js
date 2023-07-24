@@ -45,11 +45,11 @@ module.exports = {
 
       await Product.create({
         user_id: userId,
-        name,
-        price,
-        inventory_quantity: inventory,
+        name: name.trim(),
+        price: price.trim(),
+        inventory_quantity: inventory.trim(),
         avatar,
-        description
+        description: description.trim()
       })
       return cb(null)
     } catch (err) {
@@ -112,11 +112,11 @@ module.exports = {
 
       await product.update({
         user_id: userId,
-        name,
-        price,
-        inventory_quantity: inventory,
+        name: name.trim(),
+        price: price.trim(),
+        inventory_quantity: inventory.trim(),
         avatar,
-        description
+        description: description.trim()
       })
       return cb(null)
     } catch (err) {

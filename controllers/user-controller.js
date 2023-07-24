@@ -60,6 +60,10 @@ module.exports = {
   },
   // 修改使用者資料
   putUser: (req, res, next) => {
-    userService.putUser(req, (err, data) => err ? next(err) : res.json({ success: true, message: '個人資料修改成功' }))
+    userService.putUser(req, err => err ? next(err) : res.json({ success: true, message: '個人資料修改成功' }))
+  },
+  // 修改使用者密碼
+  putPassword: (req, res, next) => {
+    userService.putPassword(req, err => err ? next(err) : res.json({ success: true, message: '密碼修改成功' }))
   }
 }

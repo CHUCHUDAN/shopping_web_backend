@@ -8,12 +8,11 @@ const products = require('./modules/products')
 const shopcars = require('./modules/shopcars')
 const stores = require('./modules/stores')
 const users = require('./modules/users')
-const upload = require('../../middleware/multer')
 const { authenticated, isBuyer, isSeller } = require('../../middleware/auth')
 const { validation } = require('../../middleware/validation')
 
 // 登入
-router.post('/users/signin', upload.single('avatar'), validation, passport.authenticate('local', { session: false }), userController.signIn)
+router.post('/users/signin', validation, passport.authenticate('local', { session: false }), userController.signIn)
 // 註冊
 router.post('/user', validation, userController.signUp)
 

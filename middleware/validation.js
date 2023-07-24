@@ -54,7 +54,7 @@ const validationData = {
   nameOfRegisterValid: new ObjDataGenerate('使用者名稱', undefined, undefined, undefined, NAME_REGISTER_MAX_COUNT),
   accountOfRegisterValid: new ObjDataGenerate('帳號', undefined, undefined, undefined, ACCOUNT_REGISTER_MAX_COUNT),
   roleOfRegisterValid: new ObjDataGenerate('帳號類型', undefined, undefined, undefined, ROLE_REGISTER_MAX_COUNT),
-  passwordOfRegisterValid: new ObjDataGenerate('密碼', undefined, undefined, undefined, undefined),
+  passwordOfRegisterValid: new ObjDataGenerate('密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
 
   // 商品上架及編輯資料
   nameOfStoreValid: new ObjDataGenerate('商品名稱', undefined, undefined, NAME_STORE_MIN_COUNT, NAME_STORE_MAX_COUNT),
@@ -66,7 +66,13 @@ const validationData = {
   nameOfEditUserValid: new ObjDataGenerate('使用者名稱', undefined, undefined, undefined, NAME_REGISTER_MAX_COUNT),
   accountOfEditUserValid: new ObjDataGenerate('帳號', undefined, undefined, undefined, ACCOUNT_REGISTER_MAX_COUNT),
   emailOfEditUserValid: new ObjDataGenerate('信箱', isEmail, undefined, EMAIL_EDIT_MIN_COUNT, EMAIL_EDIT_MAX_COUNT),
-  phoneOfEditUserValid: new ObjDataGenerate('電話', isMobilePhone, 'zh-TW', PHONE_EDIT_MIN_COUNT, PHONE_EDIT_MAX_COUNT)
+  phoneOfEditUserValid: new ObjDataGenerate('電話', isMobilePhone, 'zh-TW', PHONE_EDIT_MIN_COUNT, PHONE_EDIT_MAX_COUNT),
+
+  // 修改使用者密碼
+  passwordOldOfEditPasswordValid: new ObjDataGenerate('舊密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
+  passwordOfEditPasswordValid: new ObjDataGenerate('新密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
+  passwordCheckOfEditPasswordValid: new ObjDataGenerate('確認密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT)
+
 }
 
 module.exports = {
@@ -77,9 +83,10 @@ module.exports = {
       const { file } = req
       const body = req.body
       let afterText = ''
-      const { name, account, password, passwordCheck, role, price, inventory, description } = body
+      const { name, account, password, passwordCheck, passwordOld, role, price, inventory, description } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
+
       // 新增商品
       if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description)) {
         if (file === undefined) throw new CustomError('所有值為必填', 400)
@@ -99,6 +106,10 @@ module.exports = {
         // 編輯使用者資料
       } else if (fullUrl === 'PUT/api/v1/users' && (name && account)) {
         afterText = 'OfEditUserValid'
+        // 修改使用者密碼
+      } else if (fullUrl === 'PUT/api/v1/users/password' && (passwordOld && password && passwordCheck)) {
+        if (password !== passwordCheck) throw new CustomError('密碼與確認密碼不相符', 400)
+        afterText = 'OfEditPasswordValid'
       } else {
         throw new CustomError('請填寫必填項目', 400)
       }
