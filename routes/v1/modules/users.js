@@ -10,6 +10,9 @@ router.post('/tokenCheck', userController.tokenCheck)
 // 取得使用者資料
 router.get('/', userController.getUser)
 
+// 修改使用者密碼
+router.put('/password', validation, userController.putPassword)
+
 // 修改使用者資料
 router.put('/', upload.single('avatar'), validation, userController.putUser)
 

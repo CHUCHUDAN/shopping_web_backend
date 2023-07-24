@@ -19,10 +19,10 @@ module.exports = {
       if (userAccount) throw new CustomError('帳號不可重複註冊!', 400)
 
       await User.create({
-        name,
-        account,
-        role,
-        password: await bcrypt.hash(password, 10)
+        name: name.trim(),
+        account: account.trim(),
+        role: role.trim(),
+        password: await bcrypt.hash(password.trim(), 10)
       })
       return cb(null)
     } catch (err) {
@@ -86,11 +86,35 @@ module.exports = {
       // 編輯使用者資料
 
       await user.update({
-        name,
-        account,
+        name: name.trim(),
+        account: account.trim(),
         email: email?.trim() || user.email,
         phone: phone?.trim() || user.phone,
         avatar: avatar || user.avatar
+      })
+
+      return cb(null)
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  // 修改使用者密碼
+  putPassword: async (req, cb) => {
+    try {
+      const { passwordOld, password } = req.body
+      const userId = getUser(req).id
+      const user = await User.findByPk(userId)
+
+      // 檢查使用者是否存在
+      if (!user) throw new CustomError('使用者不存在!', 404)
+
+      // 檢查舊密碼是否正確
+      const res = await bcrypt.compare(passwordOld, user.password)
+      if (!res) throw new CustomError('舊密碼輸入錯誤！', 404)
+
+      // 修改密碼
+      await user.update({
+        password: await bcrypt.hash(password.trim(), 10)
       })
 
       return cb(null)
