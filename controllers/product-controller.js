@@ -23,5 +23,14 @@ module.exports = {
       product.addShopTime = switchTime(product.createdAt)
       return res.json({ success: true, data: { product } })
     })
+  },
+  // 取得所有商品分類
+  getCategories: (req, res, next) => {
+    productService.getCategories(req, (err, data) => {
+      if (err) return next(err)
+      const categories = data.categories
+
+      return res.json({ success: true, data: { categories } })
+    })
   }
 }
