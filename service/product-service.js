@@ -17,13 +17,14 @@ module.exports = {
       const keyword = req.query.keyword ? req.query.keyword : null
       const minQuantity = req.query.minQuantity ? req.query.minQuantity : MIN_DEFAULT
       const maxQuantity = req.query.maxQuantity ? req.query.maxQuantity : MAX_DEFAULT
+      const categoryId = req.query.category_id
       const page = Number(req.query.page) || DEFAULT_PAGE
       const limit = Number(req.query.limit) || DEFAULT_LIMIT
       const offset = getOffset(limit, page)
 
       const products = await Product.findAndCountAll({
         raw: true,
-        where: filterSet(min, max, keyword, minQuantity, maxQuantity), // 將篩選條件丟給filterSet處理
+        where: filterSet(min, max, keyword, minQuantity, maxQuantity, categoryId), // 將篩選條件丟給filterSet處理
         order: [['created_at', 'DESC']],
         limit,
         offset

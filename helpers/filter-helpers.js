@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const filterSet = (min, max, keyword, minQuantity, maxQuantity) => {
+const filterSet = (min, max, keyword, minQuantity, maxQuantity, categoryId) => {
   const result = {}
   if (min || max) {
     const priceData = { [Op.between]: [min, max] }
@@ -13,6 +13,9 @@ const filterSet = (min, max, keyword, minQuantity, maxQuantity) => {
   if (minQuantity || maxQuantity) {
     const quantityData = { [Op.between]: [minQuantity, maxQuantity] }
     result.inventory_quantity = { ...quantityData }
+  }
+  if (categoryId) {
+    result.category_id = categoryId
   }
   return result
 }
