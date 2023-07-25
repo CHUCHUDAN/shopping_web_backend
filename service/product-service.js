@@ -59,5 +59,17 @@ module.exports = {
     } catch (err) {
       return cb(err)
     }
+  },
+  // 取得所有商品分類
+  getCategories: async (req, cb) => {
+    try {
+      const categories = await Category.findAll({
+        raw: true,
+        attributes: ['id', 'name']
+      })
+      return cb(null, { categories })
+    } catch (err) {
+      return cb(err)
+    }
   }
 }
