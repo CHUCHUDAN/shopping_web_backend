@@ -1,6 +1,7 @@
 const { Product, Shopcar, Category } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
 const { CustomError } = require('../helpers/error-builder')
+const { productsCheck, shopcarsCheck } = require('../helpers/shopcarCheck')
 
 module.exports = {
   // 取得所有商品
@@ -83,23 +84,33 @@ module.exports = {
     try {
       const userId = getUser(req).id
       const body = req.body
-      for (const key in body) {
-        // 檢查商品是否存在
-        const product = await Product.findByPk(key, {
-          attributes: ['id']
-        })
-        if (!product) throw new CustomError('商品不存在！', 404)
 
-        // 檢查是否在購物車內
-        const shopcar = await Shopcar.findOne({
-          where: { user_id: userId, product_id: key },
-          attributes: ['id']
-        })
-        if (!shopcar) throw new CustomError('商品還未加入購物車！', 400)
+      // 轉成只有商品id值的陣列
+      const keysArray = Object.keys(body)
 
-        // 更新購物車數量
+      // 檢查商品是否存在
+
+      const products = await productsCheck(keysArray)
+      if (products instanceof Error) throw new CustomError('商品不存在！', 404)
+
+      // 檢查是否都在該使用者的購物車內
+
+      const shopcars = await shopcarsCheck(userId, keysArray)
+      if (shopcars instanceof Error) throw new CustomError('商品還未加入購物車！', 400)
+
+      // 檢查存貨是否足夠
+      const inventoryCheck = products.every(item => {
+        const productId = String(item.id)
+        return item.inventory_quantity >= body[productId] && body[productId] > 0
+      })
+
+      if (!inventoryCheck) throw new CustomError('商品存貨不足或修改數量小於1!', 400)
+
+      // 更新購物車數量
+      for (const shopcar of shopcars) {
+        const productId = String(shopcar.product_id)
         await shopcar.update({
-          quantity: body[key]
+          quantity: body[productId]
         })
       }
       return cb(null)
@@ -112,36 +123,49 @@ module.exports = {
     try {
       const userId = getUser(req).id
       const body = req.body
-      for (const key in body) {
-        // 檢查商品是否存在
-        const product = await Product.findByPk(key, {
-          attributes: ['id', 'inventory_quantity']
-        })
-        if (!product) throw new CustomError('商品不存在！', 404)
 
-        // 檢查是否在購物車內
-        const shopcar = await Shopcar.findOne({
-          where: { user_id: userId, product_id: key },
-          attributes: ['id', 'quantity']
-        })
-        if (!shopcar) throw new CustomError('商品還未加入購物車！', 400)
+      // 轉成只有商品id值的陣列
+      const keysArray = Object.keys(body)
 
-        // 檢查商品數量是否正確
-        if (shopcar.quantity !== body[key]) throw new CustomError('請先更新購物車再進行結帳！', 400)
+      // 檢查商品是否存在
+      const products = await productsCheck(keysArray)
+      if (products instanceof Error) throw new CustomError('商品不存在！', 404)
 
-        // 檢查存貨是否足夠
-        if (product.inventory_quantity < body[key]) throw new CustomError('商品存貨不足！', 400)
+      // 檢查存貨是否足夠
+      const inventoryCheck = products.every(item => {
+        const productId = String(item.id)
+        return item.inventory_quantity >= body[productId]
+      })
 
-        const inventoryQuantity = product.inventory_quantity - body[key]
+      if (!inventoryCheck) throw new CustomError('商品存貨不足！', 400)
 
-        // 減少商品存貨數量
+      // 檢查是否在該使用者的購物車內
+      const shopcars = await shopcarsCheck(userId, keysArray)
+      if (shopcars instanceof Error) throw new CustomError('商品還未加入購物車！', 400)
+
+      // 檢查商品數量是否正確
+      const quantityCheck = shopcars.every(item => {
+        const productId = String(item.product_id)
+        return productId in body && item.quantity === body[productId]
+      })
+
+      if (!quantityCheck) throw new CustomError('請先更新購物車再進行結帳！', 400)
+
+      // 減少商品存貨數量
+      for (const product of products) {
+        const productId = String(product.id)
+        const quantity = body[productId]
+        const inventoryQuantity = product.inventory_quantity - quantity
         await product.update({
           inventory_quantity: inventoryQuantity
         })
+      }
 
-        // 清空購物車
+      // 清空購物車
+      for (const shopcar of shopcars) {
         await shopcar.destroy()
       }
+
       return cb(null)
     } catch (err) {
       return cb(err)
