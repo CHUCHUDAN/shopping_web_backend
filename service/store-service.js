@@ -1,4 +1,4 @@
-const { Product, Shopcar, sequelize } = require('../models')
+const { Product, Shopcar, Category, sequelize } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
 const { imgurFileHandler } = require('../helpers/file-helper')
 const { CustomError } = require('../helpers/error-builder')
@@ -11,8 +11,10 @@ module.exports = {
       const userId = req.params.seller_id
       const products = await Product.findAll({
         raw: true,
+        nest: true,
         where: { user_id: userId },
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        include: { model: Category, attributes: ['id', 'name'] }
       })
 
       return cb(null, products)
@@ -26,8 +28,10 @@ module.exports = {
       const userId = getUser(req).id
       const products = await Product.findAll({
         raw: true,
+        nest: true,
         where: { user_id: userId },
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        include: { model: Category, attributes: ['id', 'name'] }
       })
 
       return cb(null, products)
@@ -38,13 +42,20 @@ module.exports = {
   // 商家上架商品
   postStores: async (req, cb) => {
     try {
-      const { name, price, inventory, description } = req.body
+      const { name, price, inventory, description, category } = req.body
+
+      // 檢查商品類別是否存在
+      const categories = await Category.findAll({ raw: true, attributes: ['id'] })
+      const filterCategory = categories.some(cate => cate.id === Number(category))
+      if (!filterCategory) throw new CustomError('無此商品類別！', 404)
+
       const userId = getUser(req).id
       const { file } = req
       const avatar = await imgurFileHandler(file)
 
       await Product.create({
         user_id: userId,
+        category_id: category.trim(),
         name: name.trim(),
         price: price.trim(),
         inventory_quantity: inventory.trim(),
@@ -94,7 +105,13 @@ module.exports = {
   // 商家編輯商品
   putStores: async (req, cb) => {
     try {
-      const { name, price, inventory, description } = req.body
+      const { name, price, inventory, description, category } = req.body
+
+      // 檢查商品類別是否存在
+      const categories = await Category.findAll({ raw: true, attributes: ['id'] })
+      const filterCategory = categories.some(cate => cate.id === Number(category))
+      if (!filterCategory) throw new CustomError('無此商品類別！', 404)
+
       const productId = req.params.product_id
       const userId = getUser(req).id
       const { file } = req
@@ -112,6 +129,7 @@ module.exports = {
 
       await product.update({
         user_id: userId,
+        category_id: category.trim(),
         name: name.trim(),
         price: price.trim(),
         inventory_quantity: inventory.trim(),

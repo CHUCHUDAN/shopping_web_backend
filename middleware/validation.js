@@ -20,6 +20,9 @@ const INVENTORY_STORE_MAX_COUNT = 10
 
 const DESCRIPTION_STORE_MIN_COUNT = 1
 
+const CATEGORY_STORE_MAX_COUNT = 2
+const CATEGORY_STORE_MIN_COUNT = 1
+
 // 使用者註冊資料
 const NAME_REGISTER_MAX_COUNT = 20
 
@@ -61,6 +64,7 @@ const validationData = {
   priceOfStoreValid: new ObjDataGenerate('售價', isNumeric, undefined, PRICE_STORE_MIN_COUNT, PRICE_STORE_MAX_COUNT),
   inventoryOfStoreValid: new ObjDataGenerate('存貨量', isNumeric, undefined, INVENTORY_STORE_MIN_COUNT, INVENTORY_STORE_MAX_COUNT),
   descriptionOfStoreValid: new ObjDataGenerate('商品描述', undefined, undefined, DESCRIPTION_STORE_MIN_COUNT, undefined),
+  categoryOfStoreValid: new ObjDataGenerate('商品類別', isNumeric, undefined, CATEGORY_STORE_MIN_COUNT, CATEGORY_STORE_MAX_COUNT),
 
   // 使用者編輯個人資料
   nameOfEditUserValid: new ObjDataGenerate('使用者名稱', undefined, undefined, undefined, NAME_REGISTER_MAX_COUNT),
@@ -83,12 +87,12 @@ module.exports = {
       const { file } = req
       const body = req.body
       let afterText = ''
-      const { name, account, password, passwordCheck, passwordOld, role, price, inventory, description } = body
+      const { name, account, password, passwordCheck, passwordOld, role, price, inventory, description, category } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
 
       // 新增商品
-      if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description)) {
+      if (fullUrl === 'POST/api/v1/stores' && (name && price && inventory && description && category)) {
         if (file === undefined) throw new CustomError('所有值為必填', 400)
         afterText = 'OfStoreValid'
         // 登入
@@ -100,7 +104,7 @@ module.exports = {
         if (password !== passwordCheck) throw new CustomError('密碼與確認密碼不相符', 400)
         afterText = 'OfRegisterValid'
         // 編輯商品
-      } else if (fullUrl.startsWith('PUT/api/v1/stores/') && (name && price && inventory && description)) {
+      } else if (fullUrl.startsWith('PUT/api/v1/stores/') && (name && price && inventory && description && category)) {
         if (file === undefined) throw new CustomError('所有值為必填', 400)
         afterText = 'OfStoreValid'
         // 編輯使用者資料
