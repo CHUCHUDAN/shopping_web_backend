@@ -65,7 +65,7 @@ module.exports = {
     try {
       const categories = await Category.findAll({
         raw: true,
-        attributes: ['id', 'name']
+        attributes: ['id', 'name', 'avatar']
       })
       return cb(null, { categories })
     } catch (err) {

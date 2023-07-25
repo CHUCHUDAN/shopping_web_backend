@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.STRING(20),
         allowNull: false
       },
+      avatar: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
