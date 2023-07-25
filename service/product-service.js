@@ -1,4 +1,4 @@
-const { Product, User } = require('../models')
+const { Product, User, Category } = require('../models')
 const { filterSet } = require('../helpers/filter-helpers')
 const { CustomError } = require('../helpers/error-builder')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
@@ -41,7 +41,10 @@ module.exports = {
       const product = await Product.findByPk(productId, {
         raw: true,
         nest: true,
-        include: { model: User, attributes: ['id', 'name'] }
+        include: [
+          { model: User, attributes: ['id', 'name'] },
+          { model: Category, attributes: ['id', 'name'] }
+        ]
       })
 
       // 檢查商品是否存在

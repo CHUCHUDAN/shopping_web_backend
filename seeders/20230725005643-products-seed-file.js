@@ -8,9 +8,14 @@ module.exports = {
       "SELECT id FROM Users WHERE role = 'seller';",
       { type: queryInterface.sequelize.QueryTypes.SELECT }
     )
+    const categories = await queryInterface.sequelize.query(
+      'SELECT id FROM Categories;',
+      { type: queryInterface.sequelize.QueryTypes.SELECT }
+    )
     await queryInterface.bulkInsert('Products',
       Array.from({ length: DEFAULT_PRODUCT_LIMIT }, (_, index) => ({
         user_id: users[Math.floor(Math.random() * users.length)].id,
+        category_id: categories[Math.floor(Math.random() * categories.length)].id,
         name: faker.commerce.productName(),
         price: faker.commerce.price(),
         inventory_quantity: Math.floor(Math.random() * 100) + 1,

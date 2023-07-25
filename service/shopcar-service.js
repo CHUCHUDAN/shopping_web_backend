@@ -1,4 +1,4 @@
-const { Product, Shopcar } = require('../models')
+const { Product, Shopcar, Category } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
 const { CustomError } = require('../helpers/error-builder')
 
@@ -12,7 +12,7 @@ module.exports = {
         nest: true,
         where: { user_id: userId },
         order: [['created_at', 'DESC']],
-        include: { model: Product }
+        include: { model: Product, include: { model: Category, attributes: ['id', 'name'] } }
       })
       return cb(null, { shopcars })
     } catch (err) {
