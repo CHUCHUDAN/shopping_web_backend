@@ -113,4 +113,4 @@ Installing - 專案安裝流程
     
 Contributor - 專案開發人員
 -----
-[阿嘉](https://github.com/CHUCHUDAN)
+[Daniel Chu](https://github.com/CHUCHUDAN)
