@@ -1,21 +1,36 @@
-const { Product, Shopcar, Category, sequelize } = require('../models')
+const { Product, CartProduct, Category, sequelize, Store, User } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
 const { imgurFileHandler } = require('../helpers/file-helper')
 const { CustomError } = require('../helpers/error-builder')
+const { productCheck } = require('../helpers/productsCheck')
 
 module.exports = {
 
   // 取得商家商品清單
   getStores: async (req, cb) => {
     try {
-      const userId = req.params.seller_id
-      const products = await Product.findAll({
+      const sellerId = req.params.seller_id
+
+      // 檢查商家是否存在
+      const seller = await User.findByPk(sellerId, {
         raw: true,
         nest: true,
-        where: { user_id: userId },
-        order: [['created_at', 'DESC']],
-        include: { model: Category, attributes: ['id', 'name'] }
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        include: { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } }
       })
+      if (!seller) throw new CustomError('商家不存在！', 404)
+
+      // 取出該商家所有商品
+      const storeId = seller.Store.id
+      const store = await Store.findByPk(storeId, {
+        include: {
+          model: Product,
+          include: { model: Category, attributes: { exclude: ['createdAt', 'updatedAt'] } }
+        },
+        order: [[{ model: Product }, 'created_at', 'DESC']]
+      })
+
+      const products = store.toJSON().Products
 
       return cb(null, products)
     } catch (err) {
@@ -25,14 +40,19 @@ module.exports = {
   // 取得商家本帳號商品清單
   getSelfStores: async (req, cb) => {
     try {
-      const userId = getUser(req).id
-      const products = await Product.findAll({
-        raw: true,
-        nest: true,
-        where: { user_id: userId },
-        order: [['created_at', 'DESC']],
-        include: { model: Category, attributes: ['id', 'name'] }
+      const storeId = getUser(req).Store.id
+
+      // 取出本商家所有商品
+
+      const store = await Store.findByPk(storeId, {
+        include: {
+          model: Product,
+          include: { model: Category, attributes: { exclude: ['createdAt', 'updatedAt'] } }
+        },
+        order: [[{ model: Product }, 'created_at', 'DESC']]
       })
+
+      const products = store.toJSON().Products
 
       return cb(null, products)
     } catch (err) {
@@ -45,20 +65,19 @@ module.exports = {
       const { name, price, inventory, description, category } = req.body
 
       // 檢查商品類別是否存在
-      const categories = await Category.findAll({ raw: true, attributes: ['id'] })
-      const filterCategory = categories.some(cate => cate.id === Number(category))
-      if (!filterCategory) throw new CustomError('無此商品類別！', 404)
+      const categorySearch = await Category.findByPk(category, { raw: true, attributes: ['id'] })
+      if (!categorySearch) throw new CustomError('無此商品類別！', 404)
 
-      const userId = getUser(req).id
+      const storeId = getUser(req).Store.id
       const { file } = req
       const avatar = await imgurFileHandler(file)
 
       await Product.create({
-        user_id: userId,
+        store_id: storeId,
         category_id: category.trim(),
         name: name.trim(),
         price: price.trim(),
-        inventory_quantity: inventory.trim(),
+        stock: inventory.trim(),
         avatar,
         description: description.trim()
       })
@@ -74,24 +93,27 @@ module.exports = {
 
     try {
       const productId = req.params.product_id
-      const userId = getUser(req).id
+      const storeId = getUser(req).Store.id
 
       // 檢查商品是否存在
-      const product = await Product.findByPk(productId, {
-        attributes: ['id', 'user_id']
-      })
-      if (!product) throw new CustomError('商品不存在！', 404)
+      const product = await productCheck(productId)
+      if (product instanceof Error) throw new CustomError('商品不存在！', 404)
 
       // 檢查商品是否為本帳號使用者的商品
-      if (product.user_id !== userId) throw new CustomError('非本帳號商品無法下架！', 400)
+      if (product.store_id !== storeId) throw new CustomError('非本帳號商品無法下架！', 400)
 
       // 刪除商品跟購物車內之該商品
+      const productsOfCart = await Product.findByPk(productId, {
+        include: { model: CartProduct }
+      })
+
+      const cartProducts = productsOfCart.CartProducts
+
+      for (const cartProduct of cartProducts) {
+        await cartProduct.destroy({ transaction })
+      }
 
       await product.destroy({ transaction })
-      const shopcars = await Shopcar.findAll({ where: { product_id: productId }, transaction })
-      for (const shopcar of shopcars) {
-        await shopcar.destroy({ transaction })
-      }
 
       await transaction.commit()
 
@@ -108,31 +130,28 @@ module.exports = {
       const { name, price, inventory, description, category } = req.body
 
       // 檢查商品類別是否存在
-      const categories = await Category.findAll({ raw: true, attributes: ['id'] })
-      const filterCategory = categories.some(cate => cate.id === Number(category))
-      if (!filterCategory) throw new CustomError('無此商品類別！', 404)
+      const categorySearch = await Category.findByPk(category, { raw: true, attributes: ['id'] })
+      if (!categorySearch) throw new CustomError('無此商品類別！', 404)
 
       const productId = req.params.product_id
-      const userId = getUser(req).id
+      const storeId = getUser(req).Store.id
       const { file } = req
 
       // 檢查商品是否存在
-      const product = await Product.findByPk(productId, {
-        attributes: ['id', 'user_id', 'avatar']
-      })
-      if (!product) throw new CustomError('商品不存在！', 404)
+      const product = await productCheck(productId)
+      if (product instanceof Error) throw new CustomError('商品不存在！', 404)
 
       // 檢查商品是否為本帳號使用者的商品
-      if (product.user_id !== userId) throw new CustomError('非本帳號商品無法編輯！', 400)
+      if (product.store_id !== storeId) throw new CustomError('非本帳號商品無法編輯！', 400)
 
       const avatar = await imgurFileHandler(file)
 
       await product.update({
-        user_id: userId,
+        store_id: storeId,
         category_id: category.trim(),
         name: name.trim(),
         price: price.trim(),
-        inventory_quantity: inventory.trim(),
+        stock: inventory.trim(),
         avatar,
         description: description.trim()
       })

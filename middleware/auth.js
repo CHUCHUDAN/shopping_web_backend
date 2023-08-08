@@ -13,7 +13,7 @@ const authenticated = (req, res, next) => {
 // 檢查是否為買家
 const isBuyer = (req, res, next) => {
   try {
-    const user = getUser(req).toJSON()
+    const user = getUser(req)
     if (user.role !== 'buyer') throw new CustomError('你不是買家不能使用購物車功能', 401)
     return next()
   } catch (err) {
@@ -23,7 +23,7 @@ const isBuyer = (req, res, next) => {
 // 檢查是否為商家
 const isSeller = (req, res, next) => {
   try {
-    const user = getUser(req).toJSON()
+    const user = getUser(req)
     if (user.role !== 'seller') throw new CustomError('你不是商家不能使用商家功能', 401)
     return next()
   } catch (err) {
