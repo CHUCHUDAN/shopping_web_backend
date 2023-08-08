@@ -12,7 +12,7 @@ const filterSet = (min, max, keyword, minQuantity, maxQuantity, categoryId) => {
   }
   if (minQuantity || maxQuantity) {
     const quantityData = { [Op.between]: [minQuantity, maxQuantity] }
-    result.inventory_quantity = { ...quantityData }
+    result.stock = { ...quantityData }
   }
   if (categoryId) {
     result.category_id = categoryId

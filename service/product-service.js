@@ -1,4 +1,4 @@
-const { Product, User, Category } = require('../models')
+const { Product, User, Category, Store } = require('../models')
 const { filterSet } = require('../helpers/filter-helpers')
 const { CustomError } = require('../helpers/error-builder')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
@@ -14,9 +14,9 @@ module.exports = {
     try {
       const min = req.query.min ? req.query.min : MIN_DEFAULT
       const max = req.query.max ? req.query.max : MAX_DEFAULT
-      const keyword = req.query.keyword ? req.query.keyword : null
       const minQuantity = req.query.minQuantity ? req.query.minQuantity : MIN_DEFAULT
       const maxQuantity = req.query.maxQuantity ? req.query.maxQuantity : MAX_DEFAULT
+      const keyword = req.query.keyword
       const categoryId = req.query.category_id
       const page = Number(req.query.page) || DEFAULT_PAGE
       const limit = Number(req.query.limit) || DEFAULT_LIMIT
@@ -43,7 +43,7 @@ module.exports = {
         raw: true,
         nest: true,
         include: [
-          { model: User, attributes: ['id', 'name'] },
+          { model: Store, attributes: ['id', 'user_id'], include: { model: User, attributes: ['id', 'name'] } },
           { model: Category, attributes: ['id', 'name'] }
         ]
       })
@@ -51,7 +51,7 @@ module.exports = {
       // 檢查商品是否存在
       if (!product) throw new CustomError('商品不存在！', 404)
 
-      const userId = product.User.id
+      const userId = product.Store.User.id
 
       // 檢查該商品商家否存在
       if (!userId) throw new CustomError('商家不存在！', 404)

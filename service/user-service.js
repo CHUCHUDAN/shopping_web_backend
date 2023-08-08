@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Cart, Store } = require('../models')
 const { CustomError } = require('../helpers/error-builder')
 const { getUser } = require('../helpers/auth-helpers')
 const { imgurFileHandler } = require('../helpers/file-helper')
@@ -18,12 +18,25 @@ module.exports = {
       // 檢查帳號是否已經註冊過
       if (userAccount) throw new CustomError('帳號不可重複註冊!', 400)
 
-      await User.create({
+      // 建立使用者
+      const user = await User.create({
         name: name.trim(),
         account: account.trim(),
         role: role.trim(),
         password: await bcrypt.hash(password.trim(), 10)
       })
+
+      // 建立商家或購物車
+      if (role === 'buyer') {
+        await Cart.create({
+          user_id: user.id
+        })
+      } else if (role === 'seller') {
+        await Store.create({
+          user_id: user.id
+        })
+      }
+
       return cb(null)
     } catch (err) {
       return cb(err)
@@ -35,6 +48,8 @@ module.exports = {
       const sellerId = req.params.seller_id
       const seller = await User.findByPk(sellerId, {
         raw: true,
+        nest: true,
+        include: { model: Store, attributes: ['id'] },
         attributes: [
           'id',
           'name',
@@ -43,7 +58,7 @@ module.exports = {
           'avatar',
           'email',
           'phone',
-          [Sequelize.literal('(SELECT COUNT(*) FROM `products` WHERE `products`.`user_id` = `user`.`id`)'), 'productsCount'],
+          [Sequelize.literal('(SELECT COUNT(*) FROM `products` WHERE `products`.`store_id` = `store`.`id`)'), 'productsCount'],
           'created_at',
           'updated_at'
         ]
