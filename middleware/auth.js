@@ -31,8 +31,20 @@ const isSeller = (req, res, next) => {
   }
 }
 
+// 檢查是否為管理員
+const isAdmin = (req, res, next) => {
+  try {
+    const user = getUser(req)
+    if (user.role !== 'admin') throw new CustomError('你不是管理員不能使用管理員功能', 401)
+    return next()
+  } catch (err) {
+    return next(err)
+  }
+}
+
 module.exports = {
   authenticated,
   isBuyer,
-  isSeller
+  isSeller,
+  isAdmin
 }

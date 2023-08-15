@@ -1,4 +1,6 @@
 const { Op } = require('sequelize')
+const minDate = '1900'
+const maxDate = '2300'
 
 const filterSet = (min, max, keyword, minQuantity, maxQuantity, categoryId) => {
   const result = {}
@@ -19,6 +21,20 @@ const filterSet = (min, max, keyword, minQuantity, maxQuantity, categoryId) => {
   }
   return result
 }
+
+const userFilter = (role, startDate = minDate, endDate = maxDate) => {
+  const result = {}
+  if (role) {
+    result.role = role
+  }
+  if (startDate || endDate) {
+    const dateData = { [Op.between]: [startDate, endDate] }
+    result.created_at = { ...dateData }
+  }
+  return result
+}
+
 module.exports = {
-  filterSet
+  filterSet,
+  userFilter
 }
