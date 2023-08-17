@@ -154,7 +154,7 @@ module.exports = {
         { where: { email: email } }
       )
 
-      // 生成resetTkon及其過期時間
+      // 生成resetToken及其過期時間
       const resetToken = crypto.randomBytes(40).toString('hex')
       const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000)
       const expiredAt = resetTokenExpires
