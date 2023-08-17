@@ -11,7 +11,7 @@ module.exports = {
       },
       email: {
         allowNull: false,
-        type: Sequelize.STRING(255)
+        type: Sequelize.STRING(50)
       },
       token_value: {
         allowNull: false,
@@ -20,7 +20,7 @@ module.exports = {
       used: {
         allowNull: false,
         defaultValue: 0,
-        type: Sequelize.INTEGER(11)
+        type: Sequelize.INTEGER
       },
       expired_at: {
         allowNull: false,
