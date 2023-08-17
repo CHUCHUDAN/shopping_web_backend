@@ -1,9 +1,11 @@
-const { User, Cart, Store } = require('../models')
+const { User, Cart, Store, ResetPasswordToken } = require('../models')
 const { CustomError } = require('../helpers/error-builder')
 const { getUser } = require('../helpers/auth-helpers')
 const { imgurFileHandler } = require('../helpers/file-helper')
+const { sendPasswordResetEmail } = require('../helpers/mail-helpers')
 const { Sequelize } = require('sequelize')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 
 module.exports = {
   // 註冊
@@ -130,6 +132,63 @@ module.exports = {
       // 修改密碼
       await user.update({
         password: await bcrypt.hash(password.trim(), 10)
+      })
+
+      return cb(null)
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  // 忘記密碼 && 寄送驗證信
+  forgetPassword: async (req, cb) => {
+    try {
+      const email = req.body.email
+
+      // 檢查該信箱使用者是否存在
+      const user = await User.findOne({ attributes: ['id'], where: { email: email.trim() } })
+      if (!user) throw new CustomError('使用者不存在！', 404)
+
+      // 將該email對應的resetToken都標為使用過
+      await ResetPasswordToken.update(
+        { used: 1 },
+        { where: { email: email } }
+      )
+
+      // 生成resetTkon及其過期時間
+      const resetToken = crypto.randomBytes(40).toString('hex')
+      const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000)
+      const expiredAt = resetTokenExpires
+
+      // 建立resetToken資料
+      await ResetPasswordToken.create({
+        email: email.trim(),
+        token_value: resetToken,
+        expired_at: expiredAt
+      })
+
+      // 寄送含有resetToke跟email的驗證信
+      await sendPasswordResetEmail(email, resetToken)
+
+      return cb(null)
+    } catch (err) {
+      return cb(err)
+    }
+  },
+  // 忘記密碼 && 重置密碼
+  resetPassword: async (req, cb) => {
+    try {
+      const newPassword = req.body.password
+      const email = req.body.email
+
+      // 找到該email的使用者
+      const user = await User.findOne({
+        attributes: ['id'],
+        where: { email: email }
+      })
+
+      // 更新使用者密碼
+      await user.update({
+        password: await bcrypt.hash(newPassword.trim(), 10)
       })
 
       return cb(null)

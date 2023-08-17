@@ -11,11 +11,19 @@ const stores = require('./modules/stores')
 const users = require('./modules/users')
 const { authenticated, isBuyer, isSeller, isAdmin } = require('../../middleware/auth')
 const { validation } = require('../../middleware/validation')
+const { validateResetToken } = require('../../middleware/validateResetToken')
 
 // 登入
 router.post('/users/signin', validation, passport.authenticate('local', { session: false }), userController.signIn)
+
 // 註冊
 router.post('/user', validation, userController.signUp)
+
+// 忘記密碼 && 寄送驗證信
+router.post('/users/forgetPassword', validation, userController.forgetPassword)
+
+// 忘記密碼 && 重置密碼
+router.post('/users/resetPassword', validation, validateResetToken, userController.resetPassword)
 
 // 取得商家商品清單
 router.get('/stores/:seller_id', storeController.getStores)

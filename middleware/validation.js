@@ -75,8 +75,10 @@ const validationData = {
   // 修改使用者密碼
   passwordOldOfEditPasswordValid: new ObjDataGenerate('舊密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
   passwordOfEditPasswordValid: new ObjDataGenerate('新密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
-  passwordCheckOfEditPasswordValid: new ObjDataGenerate('確認密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT)
+  passwordCheckOfEditPasswordValid: new ObjDataGenerate('確認密碼', undefined, undefined, PASSWORD_SIGNIN_MIN_COUNT, PASSWORD_SIGNIN_MAX_COUNT),
 
+  // 寄送修改密碼驗證信
+  emailOfMailValid: new ObjDataGenerate('信箱', isEmail, undefined, EMAIL_EDIT_MIN_COUNT, EMAIL_EDIT_MAX_COUNT)
 }
 
 module.exports = {
@@ -87,7 +89,7 @@ module.exports = {
       const { file } = req
       const body = req.body
       let afterText = ''
-      const { name, account, password, passwordCheck, passwordOld, role, price, inventory, description, category } = body
+      const { name, account, email, password, passwordCheck, passwordOld, role, price, inventory, description, category } = body
 
       // 檢查資料來自哪個路由 && 檢查必填值
 
@@ -113,6 +115,12 @@ module.exports = {
         // 修改使用者密碼
       } else if (fullUrl === 'PUT/api/v1/users/password' && (passwordOld && password && passwordCheck)) {
         if (password !== passwordCheck) throw new CustomError('密碼與確認密碼不相符', 400)
+        afterText = 'OfEditPasswordValid'
+        // 忘記密碼 && 寄送驗證信
+      } else if (fullUrl === 'POST/api/v1/users/forgetPassword' && email) {
+        afterText = 'OfMailValid'
+        // 忘記密碼 && 重置密碼
+      } else if (fullUrl === 'POST/api/v1/users/resetPassword' && password) {
         afterText = 'OfEditPasswordValid'
       } else {
         throw new CustomError('請填寫必填項目', 400)
