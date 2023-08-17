@@ -65,5 +65,13 @@ module.exports = {
   // 修改使用者密碼
   putPassword: (req, res, next) => {
     userService.putPassword(req, err => err ? next(err) : res.json({ success: true, message: '密碼修改成功' }))
+  },
+  // 忘記密碼 && 寄送驗證信
+  forgetPassword: (req, res, next) => {
+    userService.forgetPassword(req, err => err ? next(err) : res.json({ success: true, message: '驗證信成功寄出' }))
+  },
+  // 忘記密碼 && 重置密碼
+  resetPassword: (req, res, next) => {
+    userService.resetPassword(req, err => err ? next(err) : res.json({ success: true, message: '密碼修改成功' }))
   }
 }
