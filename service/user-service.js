@@ -179,6 +179,7 @@ module.exports = {
     try {
       const newPassword = req.body.password
       const email = req.body.email
+      const resetToken = req.body.resetToken
 
       // 找到該email的使用者
       const user = await User.findOne({
@@ -189,6 +190,20 @@ module.exports = {
       // 更新使用者密碼
       await user.update({
         password: await bcrypt.hash(newPassword.trim(), 10)
+      })
+
+      // 將該resetToken設置為已使用
+      const token = await ResetPasswordToken.findOne({
+        attributes: ['id'],
+        where: {
+          email: email,
+          token_value: resetToken,
+          used: 0
+        }
+      })
+
+      await token.update({
+        used: 1
       })
 
       return cb(null)
