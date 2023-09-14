@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": " set \"NODE_ENV=development\" &&  node app.js",
-    "dev": "set \"NODE_ENV=development\" && nodemon app.js",
+    "start": " set \"NODE_ENV=production\" &&  node app.js",
+    "dev": "set \"NODE_ENV=development\" && nodemon -L app.js",
     "lint": "set \"NODE_ENV=development\" && eslint \"**/*.js\" --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -37,6 +37,7 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "eslint-plugin-promise": "^5.1.0",
+    "nodemon": "^3.0.1"
   }
 }
