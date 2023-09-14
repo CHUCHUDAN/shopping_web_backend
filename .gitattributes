@@ -51,3 +51,6 @@ Procfile          text
 
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
+
+# 將 wait-for-it.sh 不進行轉換
+wait-for-it.sh    -text
