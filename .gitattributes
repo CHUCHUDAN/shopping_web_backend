@@ -51,3 +51,6 @@ Procfile          text
 
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
+
+# 將 wait-for-it.sh 轉換為 LF 換行符
+wait-for-it.sh    text eol=lf
