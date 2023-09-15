@@ -29,7 +29,7 @@ const sendMail = (email, subject, content) => {
 // 寄送reset驗證信
 const sendPasswordResetEmail = async (email, resetToken) => {
   const subject = '密碼重置'
-  const resetUrl = `${process.env.GITHUB_PAGE}/shopping_web_frontend/#/user/resetPassword?token=${resetToken}&email=${email}`
+  const resetUrl = `${process.env.RESET_PASSWORD_URL}/#/user/resetPassword?token=${resetToken}&email=${email}`
   const message = `
     <p>請點選以下連結或複製以下連結重置密碼，連結有效期限為一小時:</p>
     <p><a href="${resetUrl}">${resetUrl}</a></p>

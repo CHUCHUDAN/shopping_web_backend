@@ -7,7 +7,11 @@
     "start": " set \"NODE_ENV=production\" &&  node app.js",
     "dev": "set \"NODE_ENV=development\" && nodemon -L app.js",
     "lint": "set \"NODE_ENV=development\" && eslint \"**/*.js\" --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devUp": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p my-project up -d --build",
+    "prodUp": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml -p my-project up -d --build",
+    "down": "docker-compose -p my-project down",
+    "downV": "docker-compose -p my-project down -v"
   },
   "keywords": [],
   "author": "",
